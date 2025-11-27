@@ -1,0 +1,30 @@
+# Binaries
+pgweb
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go build output
+/bin/
+/obj/
+*.test
+*.out
+
+# Dependency directories (default GOPATH)
+/pkg/
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Env / secrets
+.env
+*.local
+
+# Docker
+*.log
