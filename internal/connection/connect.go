@@ -69,13 +69,8 @@ func (h *ConnectionHandler) ValidateConnection(w http.ResponseWriter, req *http.
 		return
 	}
 
-	h.mu.RLock()
-	db := h.db
-	conn := h.connection
-	h.mu.RUnlock()
-
-	if db == nil {
-		http.Error(w, "No active connection. Call POST /connect first", http.StatusBadRequest)
+	db, conn, ok := h.ensureDB(w)
+	if !ok {
 		return
 	}
 
@@ -96,6 +91,10 @@ func (h *ConnectionHandler) ValidateConnection(w http.ResponseWriter, req *http.
 func (h *ConnectionHandler) CloseConnection(w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		http.Error(w, "This endpoint accepts only POST calls", http.StatusBadRequest)
+		return
+	}
+
+	if _, _, ok := h.ensureDB(w); !ok {
 		return
 	}
 

@@ -15,12 +15,8 @@ func (h *ConnectionHandler) ListSchemas(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	h.mu.RLock()
-	db := h.db
-	h.mu.RUnlock()
-
-	if db == nil {
-		http.Error(w, "No active connection. Call POST /connect first", http.StatusBadRequest)
+	db, _, ok := h.ensureDB(w)
+	if !ok {
 		return
 	}
 
