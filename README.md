@@ -16,6 +16,7 @@ Current endpoints:
 - `POST /connect` — open a connection pool using provided JSON credentials.
 - `GET /validate` — ping the active pool to ensure it is still healthy.
 - `POST /close` — close the pool and discard stored credentials.
+- `GET /schemas` — list all non-system schemas in the connected database.
 
 ### API for metadata + SQL execution
 
@@ -34,4 +35,4 @@ GET
 /tables/{table}/columns – list columns + constraints
 
 POST
-/query – run a sanitized SQL query and return rows.
+/query – run a sanitized SQL query and return rows. -> We can use DB.Query to achive this.
