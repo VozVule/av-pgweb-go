@@ -33,4 +33,5 @@ func (h *ConnectionHandler) Register(mux *http.ServeMux) {
 	mux.HandleFunc("/validate", h.ValidateConnection)
 	mux.HandleFunc("/close", h.CloseConnection)
 	mux.HandleFunc("/schemas", h.ListSchemas)
+	mux.HandleFunc("/schemas/{schema}/tables", h.ListTablesForSchema)
 }
