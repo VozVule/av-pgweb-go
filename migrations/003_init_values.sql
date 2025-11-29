@@ -25,12 +25,12 @@ SELECT d.department_id,
        v.name,
        v.code,
        e.employee_id,
-       v.starts_on,
-       v.ends_on
+       v.starts_on::date,
+       v.ends_on::date
 FROM (
     VALUES
-        ('engineering', 'Telemetry Platform', 'ENG-TEL-001', 'linus@example.com', '2025-01-01', NULL),
-        ('product', 'Mobile Redesign', 'PRO-MOB-002', 'grace@example.com', '2025-02-15', '2025-08-30')
+        ('engineering', 'Telemetry Platform', 'ENG-TEL-001', 'linus@example.com', DATE '2025-01-01', NULL),
+        ('product', 'Mobile Redesign', 'PRO-MOB-002', 'grace@example.com', DATE '2025-02-15', DATE '2025-08-30')
 ) AS v(slug, name, code, lead_email, starts_on, ends_on)
 JOIN departments d ON d.slug = v.slug
 LEFT JOIN employees e ON e.email = v.lead_email

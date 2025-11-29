@@ -28,3 +28,6 @@ pgweb
 
 # Docker
 *.log
+
+# Atlas
+atlas.hcl

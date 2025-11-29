@@ -2,6 +2,18 @@
 
 Go REST API demo with PostgreSQL via Docker Compose.
 
+## Migrations with Atlas
+
+1. Install the [Atlas CLI](https://atlasgo.io/getting-started) (`brew install ariga/tap/atlas` on macOS).
+2. Export `PGWEB_DATABASE_URL` pointing at the database you want to migrate, for example:
+   ```bash
+   export PGWEB_DATABASE_URL=postgres://pgweb:pgweb@localhost:5432/pgweb?sslmode=disable
+   ```
+3. (Optional) set `PGWEB_ATLAS_BIN` or `PGWEB_MIGRATIONS_DIR` if the binary/directory lives elsewhere. Defaults are `atlas` and `./migrations`.
+4. Run `./scripts/migrate.sh` to source `.env` and invoke `go run ./cmd/migrate`, or run `atlas migrate apply --env local` manually before starting the API. The `atlas.hcl` file in the repo defines the `local` environment (change it if your migration directory or DSN needs to differ by environment).
+
+The SQL files in `migrations/` are executed in order (`000` → `003`) to create the `company` schema, tables, indexes, and seed data. The API no longer runs migrations automatically—apply them first, then boot the server via `go run ./cmd/api`.
+
 
 ### Database connection management
 
