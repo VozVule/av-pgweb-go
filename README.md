@@ -17,6 +17,9 @@ Current endpoints:
 - `GET /validate` — ping the active pool to ensure it is still healthy.
 - `POST /close` — close the pool and discard stored credentials.
 - `GET /schemas` — list all non-system schemas in the connected database.
+- `GET /schemas/{schema}/tables` — list tables for a schema.
+- `GET /schemas/{schema}/views` — list views for a schema.
+- `GET /schemas/{schema}/indexes` — list indexes for a schema.
 
 ### API for metadata + SQL execution
 
