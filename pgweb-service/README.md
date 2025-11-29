@@ -36,6 +36,21 @@ The SQL files in `migrations/` are executed in order (`000` → `003`) to create
    ```
 4. Visit the frontend (e.g., http://localhost:5173) and set the “API Base URL” input to your backend (default `http://localhost:8080`). CORS is enabled on the API to allow the browser to call it from another origin.
 
+## Running Everything via Docker Compose
+
+1. Build and start the API + Postgres stack (Ctrl+C to stop):
+   ```bash
+   cd pgweb-service
+   docker compose up --build
+   ```
+2. Apply migrations inside the Go-based migrator image (same Dockerfile, but built with `cmd/migrate` and Atlas baked in):
+   ```bash
+   docker compose run --rm migrate
+   ```
+   The `migrate` service already includes the compiled SQL migrations plus the Atlas CLI, and it runs with `PGWEB_DATABASE_URL=postgres://pgweb:pgweb@pgweb_postgres:5432/pgweb?sslmode=disable`. No host environment variables are needed.
+
+The compose file places all services on the `app` network. Inside the API container, the Postgres host is reachable via either `db` (the service name) or the alias `pgweb_postgres`. When you call `POST /connect` from the frontend, set the `host` field to `pgweb_postgres` so the API can resolve it from within the container. If you run the API directly on your machine (without Docker), continue using `localhost`.
+
 
 ### Database connection management
 

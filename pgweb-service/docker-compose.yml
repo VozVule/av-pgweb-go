@@ -1,4 +1,26 @@
 services:
+  migrate:
+    image: pgweb-migrator:latest
+    container_name: pgweb_migrator
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGWEB_DATABASE_URL: "INSERT_YOUR_DATABASE_URL_HERE"
+    networks:
+      - app
+
+  api:
+    image: pgweb-service:latest
+    container_name: pgweb_api
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - app
+
   db:
     image: postgres:16-alpine
     container_name: pgweb_postgres
@@ -15,6 +37,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      app:
+        aliases:
+          - pgweb_postgres
+
 volumes:
   pgdata:
     driver: local
+
+networks:
+  app:
+    driver: bridge
