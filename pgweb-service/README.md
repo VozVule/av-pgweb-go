@@ -18,6 +18,24 @@ A lightweight HTMX UI lives in `frontend/`. Serve `frontend/index.html` (e.g., `
 
 The SQL files in `migrations/` are executed in order (`000` → `003`) to create the `company` schema, tables, indexes, and seed data. The API no longer runs migrations automatically—apply them first, then boot the server via `go run ./cmd/api`.
 
+## Running the Application
+
+1. **Apply migrations** (once per database):
+   ```bash
+   ./scripts/migrate.sh
+   # or: PGWEB_DATABASE_URL=... go run ./cmd/migrate
+   ```
+2. **Start the backend API** (default on `:8080`):
+   ```bash
+   go run ./cmd/api
+   ```
+3. **Start the HTMX frontend** (served separately):
+   ```bash
+   cd frontend
+   python3 -m http.server 5173   # or any static file server
+   ```
+4. Visit the frontend (e.g., http://localhost:5173) and set the “API Base URL” input to your backend (default `http://localhost:8080`).
+
 
 ### Database connection management
 
@@ -43,18 +61,3 @@ Current endpoints:
 ### API for metadata + SQL execution
 
 Read-only metadata endpoints:
-
-GET
-
-/schemas – list schemas
-
-/schemas/{schema}/tables – list tables in a schema
-
-/schemas/{schema}/views – list views in a schema
-
-/schemas/{schema}/indexes – list indexes (maybe per table)
-
-/schemas/{schema}/tables/{table}/columns – list columns + constraints
-
-POST
-/query – run a sanitized SQL query and return rows. -> We can use DB.Query to achive this.
