@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"pgweb/internal/util"
+
+	"github.com/lib/pq"
 )
 
 // ListSchemas handles GET /schemas to show non-system schemas.
@@ -187,6 +189,82 @@ func (h *ConnectionHandler) ListTableColumns(w http.ResponseWriter, req *http.Re
 		"schema":  schemaName,
 		"table":   tableName,
 		"columns": columns,
+	})
+}
+
+// ListTableData returns every row from schema.table, projecting arbitrary columns into JSON.
+func (h *ConnectionHandler) ListTableData(w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		http.Error(w, "This call only supports GET methods", http.StatusMethodNotAllowed)
+		return
+	}
+
+	db, _, ok := h.ensureDB(w)
+	if !ok {
+		return
+	}
+
+	schemaName := req.PathValue("schema")
+	tableName := req.PathValue("table")
+	if schemaName == "" || tableName == "" {
+		http.Error(w, "schema and table parameters are required", http.StatusBadRequest)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(req.Context(), 5*time.Second)
+	defer cancel()
+
+	// Quote the identifiers to avoid SQL injection via path parameters.
+	query := `SELECT * FROM ` + pq.QuoteIdentifier(schemaName) + `.` + pq.QuoteIdentifier(tableName)
+	rows, err := db.QueryContext(ctx, query)
+	if err != nil {
+		http.Error(w, "Failed fetching table data: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	cols, err := rows.Columns()
+	if err != nil {
+		http.Error(w, "Failed reading column metadata: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	result := make([]map[string]any, 0)
+	// Convert each SQL row into a JSON-friendly map by scanning values and pairing them with column names.
+	for rows.Next() {
+		// values array will hold actual row data
+		values := make([]any, len(cols))
+		// scanArgs is used for rows.Scan so that it can scan row values into memory via ptrs in scanArgs
+		scanArgs := make([]any, len(cols))
+		for i := range values {
+			scanArgs[i] = &values[i]
+		}
+		if err := rows.Scan(scanArgs...); err != nil {
+			http.Error(w, "Failed scanning row: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		rowMap := make(map[string]any, len(cols))
+		for i, col := range cols {
+			switch v := values[i].(type) {
+			case []byte:
+				// text/bytea come back as []byte; convert to string for JSON
+				rowMap[col] = string(v)
+			default:
+				rowMap[col] = v
+			}
+		}
+		result = append(result, rowMap)
+	}
+	if err := rows.Err(); err != nil {
+		http.Error(w, "Failed iterating rows: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	util.WriteJSON(w, http.StatusOK, map[string]any{
+		"schema": schemaName,
+		"table":  tableName,
+		"rows":   result,
 	})
 }
 

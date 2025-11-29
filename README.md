@@ -31,6 +31,7 @@ Current endpoints:
 - `GET /schemas` — list all non-system schemas in the connected database.
 - `GET /schemas/{schema}/tables` — list tables for a schema.
 - `GET /schemas/{schema}/tables/{table}/columns` — list a table's columns plus constraint metadata.
+- `GET /schemas/{schema}/tables/{table}/data` — dump table rows (limited to current DB size).
 - `GET /schemas/{schema}/views` — list views for a schema.
 - `GET /schemas/{schema}/indexes` — list indexes for a schema.
 
