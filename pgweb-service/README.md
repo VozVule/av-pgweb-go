@@ -2,6 +2,10 @@
 
 Go REST API demo with PostgreSQL via Docker Compose.
 
+## Frontend (HTMX)
+
+A lightweight HTMX UI lives in `frontend/`. Serve `frontend/index.html` (e.g., `cd frontend && python3 -m http.server 5173`) and point it at your Pgweb backend via the "API Base URL" field. The frontend consumes the same REST endpoints documented below for browsing schemas, inspecting tables, and running ad-hoc SQL.
+
 ## Migrations with Atlas
 
 1. Install the [Atlas CLI](https://atlasgo.io/getting-started) (`brew install ariga/tap/atlas` on macOS).

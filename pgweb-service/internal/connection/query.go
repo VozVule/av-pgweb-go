@@ -2,7 +2,6 @@ package connection
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 	"strings"
 	"time"

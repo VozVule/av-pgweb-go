@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pgweb Console</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>Pgweb Console</h1>
+        <p class="subtitle">HTMX frontend for the Pgweb API</p>
+      </div>
+      <div class="api-config">
+        <label for="api-base">API Base URL</label>
+        <input id="api-base" type="text" value="http://localhost:8080" />
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card span-2">
+        <div class="card__header">
+          <h2>Connection</h2>
+          <button
+            id="btn-validate"
+            class="ghost"
+            hx-get="/validate"
+            hx-swap="none"
+            data-json-target="validate"
+            hx-indicator=".indicator"
+          >
+            Validate
+          </button>
+        </div>
+        <form
+          id="connect-form"
+          class="form"
+          hx-ext="json-enc"
+          hx-post="/connect"
+          hx-swap="none"
+          data-json-target="connect"
+          hx-indicator=".indicator"
+        >
+          <div class="form__row">
+            <label>Host</label>
+            <input name="host" required placeholder="localhost" />
+          </div>
+          <div class="form__row">
+            <label>Port</label>
+            <input name="port" type="number" required value="5432" />
+          </div>
+          <div class="form__row">
+            <label>Database</label>
+            <input name="database" required value="pgweb" />
+          </div>
+          <div class="form__row">
+            <label>Username</label>
+            <input name="username" required value="pgweb" />
+          </div>
+          <div class="form__row">
+            <label>Password</label>
+            <input name="password" type="password" required value="pgweb" />
+          </div>
+          <div class="form__row">
+            <label><input type="checkbox" name="ssl_mode" /> SSL Mode</label>
+          </div>
+          <button class="primary" type="submit">Connect</button>
+        </form>
+        <div id="connect-message" class="message"></div>
+      </section>
+
+      <section class="card">
+        <div class="card__header">
+          <h2>Schemas</h2>
+          <button
+            id="btn-load-schemas"
+            class="primary"
+            hx-get="/schemas"
+            hx-swap="none"
+            data-json-target="schemas"
+            hx-indicator=".indicator"
+          >
+            Refresh
+          </button>
+        </div>
+        <div id="schemas-list" class="list"></div>
+      </section>
+
+      <section class="card span-2">
+        <div class="card__header">
+          <h2>Schema Details</h2>
+          <div class="chip" id="active-schema">No schema selected</div>
+          <div class="card__actions">
+            <button
+              id="btn-refresh-tables"
+              class="ghost"
+              hx-get="/schemas/{schema}/tables"
+              hx-swap="none"
+              data-json-target="tables"
+              hx-indicator=".indicator"
+            >
+              Refresh Tables
+            </button>
+            <button
+              id="btn-refresh-views"
+              class="ghost"
+              hx-get="/schemas/{schema}/views"
+              hx-swap="none"
+              data-json-target="views"
+              hx-indicator=".indicator"
+            >
+              Refresh Views
+            </button>
+            <button
+              id="btn-refresh-indexes"
+              class="ghost"
+              hx-get="/schemas/{schema}/indexes"
+              hx-swap="none"
+              data-json-target="indexes"
+              hx-indicator=".indicator"
+            >
+              Refresh Indexes
+            </button>
+          </div>
+        </div>
+        <div class="columns">
+          <div>
+            <h3>Tables</h3>
+            <div id="tables-list" class="list"></div>
+          </div>
+          <div>
+            <h3>Views</h3>
+            <div id="views-list" class="list"></div>
+          </div>
+          <div>
+            <h3>Indexes</h3>
+            <div id="indexes-list" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card span-2">
+        <div class="card__header">
+          <h2>Table Details</h2>
+          <div class="chip" id="active-table">No table selected</div>
+          <div class="card__actions">
+            <button
+              id="btn-refresh-columns"
+              class="ghost"
+              hx-get="/schemas/{schema}/tables/{table}/columns"
+              hx-swap="none"
+              data-json-target="columns"
+              hx-indicator=".indicator"
+            >
+              Load Columns
+            </button>
+            <button
+              id="btn-refresh-data"
+              class="ghost"
+              hx-get="/schemas/{schema}/tables/{table}/data"
+              hx-swap="none"
+              data-json-target="table-data"
+              hx-indicator=".indicator"
+            >
+              Load Data
+            </button>
+          </div>
+        </div>
+        <div class="columns">
+          <div>
+            <h3>Columns</h3>
+            <div id="columns-list" class="table"></div>
+          </div>
+          <div>
+            <h3>Preview Data</h3>
+            <div id="data-preview" class="table"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card span-2">
+        <div class="card__header">
+          <h2>SQL Runner</h2>
+        </div>
+        <form
+          id="query-form"
+          class="form"
+          hx-ext="json-enc"
+          hx-post="/query"
+          hx-swap="none"
+          data-json-target="query"
+          hx-indicator=".indicator"
+        >
+          <textarea name="query" rows="6" placeholder="SELECT * FROM company.departments;" required></textarea>
+          <button class="primary" type="submit">Run Query</button>
+        </form>
+        <div id="query-result" class="table"></div>
+      </section>
+    </main>
+
+    <div class="indicator htmx-indicator">Loading…</div>
+    <div id="toast" class="toast" role="status"></div>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>
