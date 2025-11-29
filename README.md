@@ -34,6 +34,7 @@ Current endpoints:
 - `GET /schemas/{schema}/tables/{table}/data` — dump table rows (limited to current DB size).
 - `GET /schemas/{schema}/views` — list views for a schema.
 - `GET /schemas/{schema}/indexes` — list indexes for a schema.
+- `POST /query` — execute arbitrary SQL (use with caution!).
 
 ### API for metadata + SQL execution
 
