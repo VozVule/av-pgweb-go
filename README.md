@@ -30,6 +30,7 @@ Current endpoints:
 - `POST /close` — close the pool and discard stored credentials.
 - `GET /schemas` — list all non-system schemas in the connected database.
 - `GET /schemas/{schema}/tables` — list tables for a schema.
+- `GET /schemas/{schema}/tables/{table}/columns` — list a table's columns plus constraint metadata.
 - `GET /schemas/{schema}/views` — list views for a schema.
 - `GET /schemas/{schema}/indexes` — list indexes for a schema.
 
@@ -47,7 +48,7 @@ GET
 
 /schemas/{schema}/indexes – list indexes (maybe per table)
 
-/tables/{table}/columns – list columns + constraints
+/schemas/{schema}/tables/{table}/columns – list columns + constraints
 
 POST
 /query – run a sanitized SQL query and return rows. -> We can use DB.Query to achive this.

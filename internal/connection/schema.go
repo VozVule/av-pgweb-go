@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"pgweb/internal/util"
@@ -108,6 +109,84 @@ func (h *ConnectionHandler) ListTablesForSchema(w http.ResponseWriter, req *http
 		"schema": schemaName,
 		"tables": tables,
 		"count":  len(tables),
+	})
+}
+
+// ListTableColumns details columns, types, and constraints for schema.table.
+func (h *ConnectionHandler) ListTableColumns(w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		http.Error(w, "This call only supports GET methods", http.StatusMethodNotAllowed)
+		return
+	}
+
+	db, _, ok := h.ensureDB(w)
+	if !ok {
+		return
+	}
+
+	schemaName := req.PathValue("schema")
+	tableName := req.PathValue("table")
+	if schemaName == "" || tableName == "" {
+		http.Error(w, "schema and table parameters are required", http.StatusBadRequest)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(req.Context(), 2*time.Second)
+	defer cancel()
+
+	rows, err := db.QueryContext(ctx, `
+		SELECT c.column_name,
+		       c.data_type,
+		       COALESCE(string_agg(DISTINCT tc.constraint_type, ','), '') AS constraint_types
+		FROM information_schema.columns c
+		LEFT JOIN information_schema.key_column_usage k
+		  ON c.table_schema = k.table_schema
+		 AND c.table_name = k.table_name
+		 AND c.column_name = k.column_name
+		LEFT JOIN information_schema.table_constraints tc
+		  ON k.constraint_schema = tc.constraint_schema
+		 AND k.constraint_name = tc.constraint_name
+		WHERE c.table_schema = $1
+		  AND c.table_name = $2
+		GROUP BY c.column_name, c.data_type, c.ordinal_position
+		ORDER BY c.ordinal_position
+	`, schemaName, tableName)
+	if err != nil {
+		http.Error(w, "Failed fetching column metadata: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	columns := make([]map[string]any, 0)
+	for rows.Next() {
+		var (
+			name          string
+			typeName      string
+			constraintCSV string
+		)
+		if err := rows.Scan(&name, &typeName, &constraintCSV); err != nil {
+			http.Error(w, "Failed to scan column metadata: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		constraints := []string{}
+		if constraintCSV != "" {
+			constraints = strings.Split(constraintCSV, ",")
+		}
+		columns = append(columns, map[string]any{
+			"name":        name,
+			"type":        typeName,
+			"constraints": constraints,
+		})
+	}
+	if err := rows.Err(); err != nil {
+		http.Error(w, "Failed to iterate columns: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	util.WriteJSON(w, http.StatusOK, map[string]any{
+		"schema":  schemaName,
+		"table":   tableName,
+		"columns": columns,
 	})
 }
 

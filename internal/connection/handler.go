@@ -32,8 +32,9 @@ func (h *ConnectionHandler) Register(mux *http.ServeMux) {
     mux.HandleFunc("/connect", h.SetConnectionAndConnect)
     mux.HandleFunc("/validate", h.ValidateConnection)
     mux.HandleFunc("/close", h.CloseConnection)
-    mux.HandleFunc("/schemas", h.ListSchemas)
-    mux.HandleFunc("/schemas/{schema}/tables", h.ListTablesForSchema)
-    mux.HandleFunc("/schemas/{schema}/views", h.ListViewsForSchema)
-    mux.HandleFunc("/schemas/{schema}/indexes", h.ListIndexesForSchema)
+	mux.HandleFunc("/schemas", h.ListSchemas)
+	mux.HandleFunc("/schemas/{schema}/tables", h.ListTablesForSchema)
+	mux.HandleFunc("/schemas/{schema}/tables/{table}/columns", h.ListTableColumns)
+	mux.HandleFunc("/schemas/{schema}/views", h.ListViewsForSchema)
+	mux.HandleFunc("/schemas/{schema}/indexes", h.ListIndexesForSchema)
 }
