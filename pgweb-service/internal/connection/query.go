@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"pgweb/internal/util"
+	"pgweb-service/internal/util"
 )
 
 // ExecuteQuery runs arbitrary SQL provided by the caller and returns rows/metadata.

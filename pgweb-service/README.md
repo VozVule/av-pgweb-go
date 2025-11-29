@@ -34,7 +34,7 @@ The SQL files in `migrations/` are executed in order (`000` → `003`) to create
    cd frontend
    python3 -m http.server 5173   # or any static file server
    ```
-4. Visit the frontend (e.g., http://localhost:5173) and set the “API Base URL” input to your backend (default `http://localhost:8080`).
+4. Visit the frontend (e.g., http://localhost:5173) and set the “API Base URL” input to your backend (default `http://localhost:8080`). CORS is enabled on the API to allow the browser to call it from another origin.
 
 
 ### Database connection management

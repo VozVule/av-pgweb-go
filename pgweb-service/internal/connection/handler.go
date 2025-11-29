@@ -14,12 +14,12 @@ type ConnectionHandler struct {
 }
 
 type Connection struct {
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Database string `json:"database"`
-	SSLMode  bool   `json:"ssl_mode"`
+	Host     string   `json:"host"`
+	Port     IntValue `json:"port"`
+	Username string   `json:"username"`
+	Password string   `json:"password"`
+	Database string   `json:"database"`
+	SSLMode  bool     `json:"ssl_mode"`
 }
 
 // NewConnectionHandler creates a handler with no active DB pool.

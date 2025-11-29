@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"pgweb/internal/migrate"
+	"pgweb-service/internal/migrate"
 )
 
 func main() {

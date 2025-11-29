@@ -26,7 +26,7 @@
           <h2>Connection</h2>
           <button
             id="btn-validate"
-            class="ghost"
+            class="btn-success"
             hx-get="/validate"
             hx-swap="none"
             data-json-target="validate"
@@ -89,7 +89,7 @@
         <div id="schemas-list" class="list"></div>
       </section>
 
-      <section class="card span-2">
+      <section class="card span-3">
         <div class="card__header">
           <h2>Schema Details</h2>
           <div class="chip" id="active-schema">No schema selected</div>
@@ -127,16 +127,19 @@
           </div>
         </div>
         <div class="columns">
-          <div>
+          <div class="column-card">
             <h3>Tables</h3>
+            <p class="muted">Select a schema to view available tables.</p>
             <div id="tables-list" class="list"></div>
           </div>
-          <div>
+          <div class="column-card">
             <h3>Views</h3>
+            <p class="muted">Refresh to fetch view names.</p>
             <div id="views-list" class="list"></div>
           </div>
-          <div>
+          <div class="column-card">
             <h3>Indexes</h3>
+            <p class="muted">Refresh to fetch index metadata.</p>
             <div id="indexes-list" class="list"></div>
           </div>
         </div>
@@ -170,12 +173,14 @@
           </div>
         </div>
         <div class="columns">
-          <div>
+          <div class="column-card">
             <h3>Columns</h3>
+            <p class="muted">Load column metadata for the selected table.</p>
             <div id="columns-list" class="table"></div>
           </div>
-          <div>
+          <div class="column-card">
             <h3>Preview Data</h3>
+            <p class="muted">Load table data to preview up to 100 rows.</p>
             <div id="data-preview" class="table"></div>
           </div>
         </div>

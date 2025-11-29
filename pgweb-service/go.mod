@@ -1,4 +1,4 @@
-module pgweb
+module pgweb-service
 
 go 1.22.2
 

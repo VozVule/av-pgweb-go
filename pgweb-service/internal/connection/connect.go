@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"pgweb/internal/util"
+	"pgweb-service/internal/util"
 
 	_ "github.com/lib/pq"
 )
@@ -126,14 +126,14 @@ func (c Connection) ToConnString() string {
 	}
 
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		c.Host, c.Port, c.Username, c.Password, c.Database, sslMode)
+		c.Host, int(c.Port), c.Username, c.Password, c.Database, sslMode)
 }
 
 func validateConnection(c Connection) error {
 	if c.Host == "" {
 		return errors.New("host is required")
 	}
-	if c.Port <= 0 {
+	if int(c.Port) <= 0 {
 		return errors.New("port must be > 0")
 	}
 	if c.Database == "" {

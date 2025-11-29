@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"pgweb/internal/util"
+	"pgweb-service/internal/util"
 
 	"github.com/lib/pq"
 )
