@@ -223,41 +223,9 @@ func (h *ConnectionHandler) ListTableData(w http.ResponseWriter, req *http.Reque
 	}
 	defer rows.Close()
 
-	cols, err := rows.Columns()
+	_, result, err := util.RowsToMaps(rows)
 	if err != nil {
-		http.Error(w, "Failed reading column metadata: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	result := make([]map[string]any, 0)
-	// Convert each SQL row into a JSON-friendly map by scanning values and pairing them with column names.
-	for rows.Next() {
-		// values array will hold actual row data
-		values := make([]any, len(cols))
-		// scanArgs is used for rows.Scan so that it can scan row values into memory via ptrs in scanArgs
-		scanArgs := make([]any, len(cols))
-		for i := range values {
-			scanArgs[i] = &values[i]
-		}
-		if err := rows.Scan(scanArgs...); err != nil {
-			http.Error(w, "Failed scanning row: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		rowMap := make(map[string]any, len(cols))
-		for i, col := range cols {
-			switch v := values[i].(type) {
-			case []byte:
-				// text/bytea come back as []byte; convert to string for JSON
-				rowMap[col] = string(v)
-			default:
-				rowMap[col] = v
-			}
-		}
-		result = append(result, rowMap)
-	}
-	if err := rows.Err(); err != nil {
-		http.Error(w, "Failed iterating rows: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed reading table rows: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
